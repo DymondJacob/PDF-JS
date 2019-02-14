@@ -11,7 +11,31 @@ ctx = canvas.getContext('2d');
 
 // Render the page
 const renderPage = num => {
+pageIsRendering = true;
 
+// Get page
+pdfDoc.getPage(num).then(page => {
+    // Set the scale
+    const viewport = page.getViewport({scale});
+
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    const renderCtx = {
+        canvasContext: ctx,
+        viewport
+    }
+
+    page.render(renderCtx).promise.then(() => {
+        pageIsRendering = false;
+        if(pageNumIsPending !== null){
+            renderPage(pageNumIsPending);
+            pageNumIsPending = null;
+        }
+    })
+    // Output current page
+    document.querySelector('#page-num').textContent = num
+})
 }
 
 
